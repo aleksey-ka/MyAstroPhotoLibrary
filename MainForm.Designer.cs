@@ -814,7 +814,7 @@
             this.MaxVNumericUpDown.Size = new System.Drawing.Size( 56, 22 );
             this.MaxVNumericUpDown.TabIndex = 14;
             this.MaxVNumericUpDown.Value = new decimal( new int[] {
-            255,
+            1024,
             0,
             0,
             0} );

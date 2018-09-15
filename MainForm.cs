@@ -161,7 +161,7 @@ namespace MyAstroPhotoLibrary
             BgRnumericUpDown.Value = 0;
             BgGnumericUpDown.Value = 0;
             BgBnumericUpDown.Value = 0;
-            MaxVNumericUpDown.Value = 255;
+            MaxVNumericUpDown.Value = 1024;
             BgNumericUpDown.Value = 0;
             KgNumericUpDown.Value = 135;
             KbNumericUpDown.Value = 245;
@@ -170,7 +170,9 @@ namespace MyAstroPhotoLibrary
             recalcCurve();
 
             hideStackPanel();
+            var start = DateTime.Now;
             updateImageView();
+            System.Diagnostics.Trace.WriteLine( string.Format( "TIMER: {0} ms", ( DateTime.Now - start ).TotalMilliseconds ) );
 
             stackButton.Enabled = thumbnailsView.SelectedImages.Any();
         }
@@ -513,7 +515,9 @@ namespace MyAstroPhotoLibrary
         private void pictureBox_MouseDown( object sender, MouseEventArgs e )
         {
             if( e.Button == MouseButtons.Left ) {
+                var start = DateTime.Now;
                 showZoomAt( pictureBox.PointToClient( Control.MousePosition ) );
+                System.Diagnostics.Trace.WriteLine( string.Format( "TIMER ZOOM: {0} ms", ( DateTime.Now - start ).TotalMilliseconds ) );
                 if( ( Control.ModifierKeys & Keys.Shift ) != 0 ) {
                     var size = zoomPictureBox.ClientSize;
                     Cursor.Position = zoomPictureBox.PointToScreen( new Point( size.Width / 2, size.Height / 2 ) );
