@@ -185,7 +185,7 @@ namespace MyAstroPhotoLibrary
                 int nextToReport = 0;
                 foreach( var path in thumbnailsToLoad ) {
                     if( System.IO.Directory.Exists( path ) ||
-                        ".arw;.cr2;.jpg".Contains( System.IO.Path.GetExtension( path ).ToLower() ) ) {
+                        ".arw;.cr2;.jpg;.png;".Contains( System.IO.Path.GetExtension( path ).ToLower() ) ) {
                         var thumbnailData = loadThumbnailData( libraw, path );
                         lock( thumbnailsData ) {
                             thumbnailsData.Enqueue( thumbnailData );
@@ -260,7 +260,7 @@ namespace MyAstroPhotoLibrary
                                  + ( stackFiles == null ? "" : " (" + stackFiles.Length + ")" );
                         }
                     }
-                } else if( ext == ".jpg" ) {
+                } else if( ext == ".jpg" || ext == ".png" ) {
                     using( Image preview = Image.FromFile( path ) ) {
                         thumbnailData.image = createScaledImage( preview );
                     }

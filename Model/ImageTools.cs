@@ -129,7 +129,8 @@ namespace MyAstroPhotoLibrary
 
         static public IImage LoadImage( AstroPhoto.LibRaw.Instance libraw, string path, Session session )
         {
-            if( System.IO.Path.GetExtension( path ).ToLower() == ".jpg" ) {
+            var ext = System.IO.Path.GetExtension( path ).ToLower();
+            if( ext == ".jpg" || ext == ".png" ) {
                 return new PreviewOnlyImage( path );
             } else {
                 return new RawImageWrapper( libraw, path, session );
