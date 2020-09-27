@@ -976,6 +976,15 @@ namespace MyAstroPhotoLibrary
             public string FilePath;
         }
 
+        private RawImage loadRaw( string filePath )
+        {
+            var ext = System.IO.Path.GetExtension( filePath ).ToLower();
+            if( ext == ".cfa" ) {
+                return new RawImage( filePath );
+            }
+            return libraw.load_raw( filePath );
+        }
+
         private IEnumerable<RawRegion> EnumerateRaw( Rectangle rect )
         {
             var currentOffset = currentStack[currentStackIndex].Offset;
@@ -983,7 +992,7 @@ namespace MyAstroPhotoLibrary
 
             foreach( var item in currentStack ) {
                 if( !item.IsExcluded ) {
-                    using( var rawImage = libraw.load_raw( item.FilePath ) ) {
+                    using( var rawImage = loadRaw( item.FilePath ) ) {
                         var _rect = rect;
                         _rect.Offset( item.Offset );
                         //rawImage.ApplyDark( currentSession.Dark );
@@ -1019,7 +1028,8 @@ namespace MyAstroPhotoLibrary
 
         private string prepareFilePath( string srcFilePath, string folderName, string fileExtention )
         {
-            var filePath = srcFilePath.Replace( ".ARW", fileExtention ).
+            var ext = System.IO.Path.GetExtension( srcFilePath ).ToLower();
+            var filePath = srcFilePath.Replace( ext == ".cfa" ? ".cfa" : ".ARW", fileExtention ).
                             Replace( "\\RAW\\", string.Format( "\\{0}\\", folderName ) );
             
             var dirName = filePath.Substring( 0, filePath.LastIndexOf( "\\" ) );
