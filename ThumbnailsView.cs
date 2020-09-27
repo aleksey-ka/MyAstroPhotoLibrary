@@ -222,6 +222,10 @@ namespace MyAstroPhotoLibrary
                         stackFiles = System.IO.Directory.GetFiles( rawDir, "*.cr2" );
                         ext = ".cr2";
                     }
+                    if( stackFiles.Length == 0 ) {
+                        stackFiles = System.IO.Directory.GetFiles( rawDir, "*.cfa" );
+                        ext = ".cfa";
+                    }
                 }
             } else {
                 ext = System.IO.Path.GetExtension( path ).ToLower();
@@ -236,6 +240,20 @@ namespace MyAstroPhotoLibrary
                            string.Format( "1/{0:0}s", 1 / rawImage.Shutter );
                         if( stackFiles == null ) {
                             thumbnailData.label = "ISO" + rawImage.IsoSpeed.ToString( "0" ) + " - " + shutter ;
+                        } else {
+                            thumbnailData.label = System.IO.Path.GetFileName( path ) +
+                                "\nISO" + rawImage.IsoSpeed.ToString( "0" ) + " - " + shutter
+                                 + ( stackFiles == null ? "" : " (" + stackFiles.Length + ")" );
+                        }
+                    }
+                } else if( ext == ".cfa" ) {
+                    string filePath = stackFiles == null ? path : stackFiles[0];
+                    using( RawImage rawImage = new RawImage( filePath ) ) {
+                        thumbnailData.image = createScaledImage( rawImage.Preview );
+                        string shutter = rawImage.Shutter > 1 ? string.Format( "{0:0}s", rawImage.Shutter ) :
+                           string.Format( "1/{0:0}s", 1 / rawImage.Shutter );
+                        if( stackFiles == null ) {
+                            thumbnailData.label = "ISO" + rawImage.IsoSpeed.ToString( "0" ) + " - " + shutter;
                         } else {
                             thumbnailData.label = System.IO.Path.GetFileName( path ) +
                                 "\nISO" + rawImage.IsoSpeed.ToString( "0" ) + " - " + shutter

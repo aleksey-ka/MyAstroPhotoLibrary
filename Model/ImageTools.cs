@@ -62,12 +62,6 @@ namespace MyAstroPhotoLibrary
             libraw = _libraw;
             session = _session;
         }
-        public RawImageWrapper( string _filePath, Session _session )
-        {
-            filePath = _filePath;
-            libraw = null;
-            session = _session;
-        }
 
         public string FilePath { get { return filePath; } }
 
@@ -96,13 +90,13 @@ namespace MyAstroPhotoLibrary
             get
             {
                 if( rawImage == null ) {
-                    if( libraw != null ) {
+                    if( System.IO.Path.GetExtension( filePath ) == ".cfa" ) {
+                        rawImage = new RawImage( filePath );
+                    } else {
                         rawImage = libraw.load_raw_thumbnail( filePath );
                         /*if( session.ApplyFlat && session.Flat != null ) {
                             rawImage.ApplyFlat( session.Flat );
                         }*/
-                    } else {
-                        rawImage = new RawImage( filePath );
                     }
                 }
                 return rawImage;

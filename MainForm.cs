@@ -232,7 +232,7 @@ namespace MyAstroPhotoLibrary
                             string cfaPath = path + "\\CFA";
                             if( Directory.Exists( cfaPath ) ) {
                                 prepareStack( cfaPath );
-                                currentImage = new RawImageWrapper( currentStack[currentStackIndex].FilePath, currentSession );
+                                currentImage = new RawImageWrapper( libraw, currentStack[currentStackIndex].FilePath, currentSession );
                                 positionLabel.Text = string.Format( "{0} of {1}", currentStackIndex + 1, currentStack.Length );
                                 stackCheckBox.Visible = true;
                                 stackSelectedCheckBox.Checked = !currentStack[currentStackIndex].IsExcluded;
