@@ -62,6 +62,12 @@ namespace MyAstroPhotoLibrary
             libraw = _libraw;
             session = _session;
         }
+        public RawImageWrapper( string _filePath, Session _session )
+        {
+            filePath = _filePath;
+            libraw = null;
+            session = _session;
+        }
 
         public string FilePath { get { return filePath; } }
 
@@ -90,10 +96,14 @@ namespace MyAstroPhotoLibrary
             get
             {
                 if( rawImage == null ) {
-                    rawImage = libraw.load_raw_thumbnail( filePath );
-                    /*if( session.ApplyFlat && session.Flat != null ) {
-                        rawImage.ApplyFlat( session.Flat );
-                    }*/
+                    if( libraw != null ) {
+                        rawImage = libraw.load_raw_thumbnail( filePath );
+                        /*if( session.ApplyFlat && session.Flat != null ) {
+                            rawImage.ApplyFlat( session.Flat );
+                        }*/
+                    } else {
+                        rawImage = new RawImage( filePath );
+                    }
                 }
                 return rawImage;
             }
@@ -121,6 +131,8 @@ namespace MyAstroPhotoLibrary
     
     static class ImageTools
     {
+        const int offset = 512;
+
         static public IImage LoadImage( AstroPhoto.LibRaw.Instance libraw, string path, Session session )
         {
             if( System.IO.Path.GetExtension( path ).ToLower() == ".jpg" ) {
@@ -498,18 +510,18 @@ namespace MyAstroPhotoLibrary
             return Color.FromArgb( resultR, resultG, resultB );
         }*/
         
-        static public PointF RefineCenter( RawImage rawImage, Point center )
+        static public Point RefineCenter( RawImage rawImage, Point center, Size size )
         {
             var pixels = rawImage.GetRawPixels();
             int width = rawImage.Width;
-            PointF current = new PointF( center.X, center.Y );
+            /*PointF current = new PointF( center.X, center.Y );
             while( true ) {
                 double ddx = center.X - current.X;
                 double ddy = center.Y - current.Y;
                 double sumX = 0.0;
                 double sumY = 0.0;
                 double sum = 0.0;
-                int N = 7;
+                int N = 17;
                 for( int dy = -N; dy <= N; dy++ ) {
                     for( int dx = -N; dx <= N; dx++ ) {
                         double s = pixels[( center.Y + dy ) * width + center.X + dx];
@@ -534,13 +546,120 @@ namespace MyAstroPhotoLibrary
                 double dY = sumY / sum;
                 current.X += (float) dX;
                 current.Y += (float) dY;
+                int X = (int) Math.Round( current.X );
+                int Y = (int) Math.Round( current.Y );
                 if( Math.Abs( dX ) < 0.001 && Math.Abs( dY ) < 0.001 ) {
-                    return current;
+                    return new Point( X, Y );
                 }
-                center.X = (int) Math.Round( current.X );
-                center.Y = (int) Math.Round( current.Y );
+                center.X = X;
+                center.Y = Y;
             }
-            return new PointF();
+            return new Point();*/
+
+            int WX = size.Width / 2;
+            int WY = size.Height / 2;
+
+            Point current = new Point( center.X, center.Y );
+
+            int run = 0;
+            while( true ) {
+                double median = Median( pixels, width, current, size );
+
+                double sumLdX = 0;
+                double sumLdY = 0;
+                double sumL = 0;
+                for( int dy = -WY; dy <= WY; dy++ ) {
+                    int y = current.Y + dy;
+                    for( int dx = -WX; dx <= WX; dx++ ) {
+                        int x = current.X + dx;
+                        double L = pixels[y * width + x] - median;
+                        if( L > 0 ) {
+                            sumLdX += L * dx;
+                            sumLdY += L * dy;
+                            sumL += L;
+                        }
+                    }
+                }
+                double dX = sumLdX / sumL;
+                double dY = sumLdY / sumL;
+                current.X += (int)Math.Round( dX );
+                current.Y += (int)Math.Round( dY );
+                if( run++ > 1 ) {
+                    break;
+                }
+            }
+            return current;
+        }
+
+        static public double Median( ushort[] pixels, int width, Point center, Size size )
+        {
+            int WX = size.Width / 2;
+            int WY = size.Height / 2;
+
+            // Считаем медиану
+            int count = 0;
+            var counts = new int[16597];
+            for( int i = 0; i < counts.Length; i++ ) {
+                counts[i] = 0;
+            }
+            for( int dy = -WY; dy <= WY; dy++ ) {
+                int y = center.Y + dy;
+                for( int dx = -WX; dx <= WX; dx++ ) {
+                    int x = center.X + dx;
+                    int L = pixels[y * width + x];
+                    counts[L]++;
+                    count++;
+                }
+            }
+            double median = 0;
+            int sum = 0;
+            for( int i = 0; i < counts.Length; i++ ) {
+                sum += counts[i];
+                if( sum >= count / 2 ) {
+                    median = i;
+                    break;
+                }
+            }
+            return median;
+        }
+
+        static public double CalcCorrelation( RawImage rawImage, ushort[] prevPixels, 
+            Point center, Point prevCenter, Size size )
+        {
+            var pixels = rawImage.GetRawPixels();
+            int width = rawImage.Width;
+
+            int WX = size.Width / 2;
+            int WY = size.Height / 2;
+
+            double median = Median( pixels, width, center, size );
+            double prevMedian = Median( prevPixels, width, prevCenter, size );
+
+            int n = 0;
+            double sumXY = 0;
+            double sumXX = 0;
+            double sumYY = 0;
+            double sumX = 0;
+            double sumY = 0;
+            for( int dy = -WY; dy <= WY; dy++ ) {
+                int y1 = center.Y + dy;
+                int y2 = prevCenter.Y + dy;
+                for( int dx = -WX; dx <= WX; dx++ ) {
+                    int x1 = center.X + dx;
+                    int x2 = prevCenter.X + dx;
+                    double X = pixels[y1 * width + x1] - median;
+                    double Y = prevPixels[y2 * width + x2] - prevMedian;
+                    sumXY += X * Y;
+                    sumXX += X * X;
+                    sumYY += Y * Y;
+                    sumX += X;
+                    sumY += Y;
+                    n++;
+                }
+            }
+            double result = ( n * sumXY - sumX * sumY ) /
+                Math.Sqrt( ( n * sumXX - sumX * sumX ) * ( n * sumYY - sumY * sumY ) );
+            return result;
         }
 
         /*static public double StarSigma( IImage image, PointF current )

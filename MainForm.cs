@@ -182,6 +182,42 @@ namespace MyAstroPhotoLibrary
             updateImageView();
         }
 
+        private void prepareStack( string rawPath )
+        {
+            if( currentStack == null ) {
+                string stackFile = rawPath + "\\stack.txt";
+                if( File.Exists( stackFile ) ) {
+                    var lines = File.ReadAllLines( stackFile );
+                    int linesPerRecord = 0;
+                    for( int i = 0; i < lines.Length; i++ ) {
+                        if( lines[i].StartsWith( "#" ) ) {
+                            linesPerRecord++;
+                            continue;
+                        }
+                        currentStack = new StackItem[( lines.Length - i ) / linesPerRecord];
+                        break;
+                    }
+                    for( int i = 0; i < currentStack.Length; i++ ) {
+                        string fileName = lines[( i + 1 ) * linesPerRecord + 0];
+                        string[] offset = lines[( i + 1 ) * linesPerRecord + 1].Split( ',' );
+                        currentStack[i] = new StackItem()
+                        {
+                            FilePath = Path.Combine( rawPath, fileName ),
+                            Offset = new Point( int.Parse( offset[0] ), int.Parse( offset[1] ) )
+                        };
+                    }
+                    zoomCenterX = currentStack[0].Offset.X;
+                    zoomCenterY = currentStack[0].Offset.Y;
+                } else {
+                    var files = Directory.GetFiles( rawPath );
+                    currentStack = new StackItem[files.Length];
+                    for( int i = 0; i < files.Length; i++ ) {
+                        currentStack[i] = new StackItem() { FilePath = files[i] };
+                    }
+                }
+            }
+        }
+
         private void updateImageView()
         {
             if( stackedImage == null ) {
@@ -193,45 +229,24 @@ namespace MyAstroPhotoLibrary
                             currentStack = null;
                             positionLabel.Text = "...";
                         } else if( Directory.Exists( path ) ) {
-                            string rawPath = path + "\\RAW";
-                            if( Directory.Exists( rawPath ) ) {
-                                if( currentStack == null ) {
-                                    string stackFile = rawPath + "\\stack.txt";
-                                    if( File.Exists( stackFile ) ) {
-                                        var lines = File.ReadAllLines( stackFile );
-                                        int linesPerRecord = 0;
-                                        for( int i = 0; i < lines.Length; i++ ) {
-                                            if( lines[i].StartsWith( "#" ) ) {
-                                                linesPerRecord++;
-                                                continue;
-                                            }
-                                            currentStack = new StackItem[( lines.Length - i ) / linesPerRecord];
-                                            break;
-                                        }
-                                        for( int i = 0; i < currentStack.Length; i++ ) {
-                                            string fileName = lines[( i + 1 ) * linesPerRecord + 0];
-                                            string[] offset = lines[( i + 1 ) * linesPerRecord + 1].Split( ',' );
-                                            currentStack[i] = new StackItem()
-                                            {
-                                                FilePath = Path.Combine( rawPath, fileName ),
-                                                Offset = new Point( int.Parse( offset[0] ), int.Parse( offset[1] ) )
-                                            };
-                                        }
-                                        zoomCenterX = currentStack[0].Offset.X;
-                                        zoomCenterY = currentStack[0].Offset.Y;
-                                    } else {
-                                        var files = Directory.GetFiles( rawPath );
-                                        currentStack = new StackItem[files.Length];
-                                        for( int i = 0; i < files.Length; i++ ) {
-                                            currentStack[i] = new StackItem() { FilePath = files[i] };
-                                        }
-                                    }
-                                }
-                                currentImage = new RawImageWrapper( libraw, currentStack[currentStackIndex].FilePath, currentSession );
+                            string cfaPath = path + "\\CFA";
+                            if( Directory.Exists( cfaPath ) ) {
+                                prepareStack( cfaPath );
+                                currentImage = new RawImageWrapper( currentStack[currentStackIndex].FilePath, currentSession );
                                 positionLabel.Text = string.Format( "{0} of {1}", currentStackIndex + 1, currentStack.Length );
                                 stackCheckBox.Visible = true;
                                 stackSelectedCheckBox.Checked = !currentStack[currentStackIndex].IsExcluded;
                                 stackSelectedCheckBox.Enabled = true;
+                            } else {
+                                string rawPath = path + "\\RAW";
+                                if( Directory.Exists( rawPath ) ) {
+                                    prepareStack( rawPath );
+                                    currentImage = new RawImageWrapper( libraw, currentStack[currentStackIndex].FilePath, currentSession );
+                                    positionLabel.Text = string.Format( "{0} of {1}", currentStackIndex + 1, currentStack.Length );
+                                    stackCheckBox.Visible = true;
+                                    stackSelectedCheckBox.Checked = !currentStack[currentStackIndex].IsExcluded;
+                                    stackSelectedCheckBox.Enabled = true;
+                                }
                             }
                         }
                     } else {
@@ -457,9 +472,10 @@ namespace MyAstroPhotoLibrary
         void showZoomImage( bool refineCenter, bool centerCursor )
         {   
             if( refineCenter ) {
-                PointF newCenter = ImageTools.RefineCenter( currentImage.RawImage, new Point( zoomCenterX, zoomCenterY ) );
-                zoomCenterX = (int) System.Math.Round( newCenter.X );
-                zoomCenterY = (int) System.Math.Round( newCenter.Y );
+                Point newCenter = ImageTools.RefineCenter( currentImage.RawImage, 
+                    new Point( zoomCenterX, zoomCenterY ), currentZoomRect.Size );
+                zoomCenterX = newCenter.X;
+                zoomCenterY = newCenter.Y;
             }
             showZoomImage();
             if( centerCursor ) {
@@ -530,8 +546,7 @@ namespace MyAstroPhotoLibrary
             if( currentStack != null  ) {
                 if( stackPanel.Visible ) {
                     if( stackFlowPanel.Controls.Count == 0 ) {
-                        var stackFiles = Directory.GetFiles( thumbnailsView.CurrentObjectPath + "\\RAW" );
-                        for( int i = 0; i < stackFiles.Length; i++ ) {
+                        for( int i = 0; i < currentStack.Length; i++ ) {
                             var exPanel = new Panel()
                             {
                                 Height = 20,
@@ -551,7 +566,7 @@ namespace MyAstroPhotoLibrary
                             panel.Click += new EventHandler( stackItem_Click );
                             var label = new Label()
                             {
-                                Text = Path.GetFileName( stackFiles[i] ),
+                                Text = Path.GetFileName( currentStack[i].FilePath ),
                                 AutoSize = true,
                                 Tag = i
                             };
@@ -645,9 +660,25 @@ namespace MyAstroPhotoLibrary
                             currentStack[currentStackIndex].Offset = new Point( zoomCenterX, zoomCenterY );
                             saveCurrentStack();
                         }
-                        if( nextButton.Enabled ) {
+                        while( nextButton.Enabled ) {
+                            var prevRaw = currentImage.RawImage.GetRawPixels();
+                            var prevCenter = new Point( ( ( zoomCenterX ) / 2 ) * 2, ( ( zoomCenterY ) / 2 ) * 2 );
                             nextButton_Click( sender, e );
                             showZoomImage( true, true );
+                            Application.DoEvents();
+                            if( e.Shift ) {
+                                double correlation = ImageTools.CalcCorrelation( currentImage.RawImage, prevRaw,
+                                    new Point( ( zoomCenterX / 2 ) * 2, ( zoomCenterY / 2 ) * 2 ), prevCenter, currentZoomRect.Size );
+                                System.Diagnostics.Trace.WriteLine( correlation.ToString() );
+                                if( correlation < 0.95 ) {
+                                    break;
+                                } else {
+                                    currentStack[currentStackIndex].Offset = new Point( zoomCenterX, zoomCenterY );
+                                    saveCurrentStack();
+                                }
+                            } else {
+                                break;
+                            }
                         }
                         e.Handled = true;
                         break;
@@ -937,6 +968,85 @@ namespace MyAstroPhotoLibrary
         private void exitFullScreen_Click( object sender, EventArgs e )
         {
             mainPictureFullScreen( false );
+        }
+
+        struct RawRegion {
+            public RawImage RawImage;
+            public Rectangle Rect;
+            public string FilePath;
+        }
+
+        private IEnumerable<RawRegion> EnumerateRaw( Rectangle rect )
+        {
+            var currentOffset = currentStack[currentStackIndex].Offset;
+            rect.Offset( -currentOffset.X, -currentOffset.Y );
+
+            foreach( var item in currentStack ) {
+                if( !item.IsExcluded ) {
+                    using( var rawImage = libraw.load_raw( item.FilePath ) ) {
+                        var _rect = rect;
+                        _rect.Offset( item.Offset );
+                        //rawImage.ApplyDark( currentSession.Dark );
+                        /*if( currentSession.Flat != null ) {
+                            rawImage.ApplyFlat( currentSession.Flat, 1 );
+                        }*/
+                        yield return new RawRegion(){
+                            RawImage = rawImage,
+                            Rect = _rect,
+                            FilePath = item.FilePath
+                        };
+                    }
+                }
+            }
+        }
+
+        struct ImageSaveAs {
+            public Image Image;
+            public string FilePath;
+        }
+
+        private IEnumerable<ImageSaveAs> EnumerateImageSaveAs( Rectangle rect )
+        {
+            int saturation = (int) satNumericUpDown.Value;
+            foreach( var item in EnumerateRaw( rect ) ) {
+                using( var rgbImage = item.RawImage.ExtractRgbImage( item.Rect ) ) {
+                    using( var image = rgbImage.RenderBitmap( currentCurve, saturation ) ) {             
+                        yield return new ImageSaveAs() { Image = image, FilePath = item.FilePath };
+                    }
+                }
+            }
+        }
+
+        private string prepareFilePath( string srcFilePath, string folderName, string fileExtention )
+        {
+            var filePath = srcFilePath.Replace( ".ARW", fileExtention ).
+                            Replace( "\\RAW\\", string.Format( "\\{0}\\", folderName ) );
+            
+            var dirName = filePath.Substring( 0, filePath.LastIndexOf( "\\" ) );
+            if( !Directory.Exists( dirName ) ) {
+                Directory.CreateDirectory( dirName );
+            }
+
+            return filePath;
+        }
+
+        private void saveStackToPng_Click( object sender, EventArgs e )
+        {
+            foreach( var item in EnumerateImageSaveAs( currentZoomRect ) ) {
+                item.Image.Save( prepareFilePath( item.FilePath, "PNG", ".png" ),
+                    System.Drawing.Imaging.ImageFormat.Png );
+            }
+        }
+
+        private void saveStackToCFA_Click( object sender, EventArgs e )
+        {
+            foreach( var item in EnumerateRaw( currentZoomRect ) ) {
+                Rectangle r = item.Rect;
+                r.Inflate( 10, 10 );
+                using( var zoomed = item.RawImage.ExtractRawImage( r ) ) {
+                    zoomed.SaveCFA( prepareFilePath( item.FilePath, "CFA", ".cfa" ) );
+                }
+            }
         }
     }
 }
