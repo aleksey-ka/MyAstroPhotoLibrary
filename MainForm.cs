@@ -209,7 +209,9 @@ namespace MyAstroPhotoLibrary
                     zoomCenterX = currentStack[0].Offset.X;
                     zoomCenterY = currentStack[0].Offset.Y;
                 } else {
-                    var files = Directory.GetFiles( rawPath );
+                    var files = Directory.GetFiles( rawPath ).Where(
+                        s => ".cfa;.arw;.cr2".Contains( 
+                        Path.GetExtension( s ).ToLower() + ";" ) ).ToArray();
                     currentStack = new StackItem[files.Length];
                     for( int i = 0; i < files.Length; i++ ) {
                         currentStack[i] = new StackItem() { FilePath = files[i] };
