@@ -883,16 +883,6 @@ namespace MyAstroPhotoLibrary
             toolsContextMenu.Show( toolsMenuButton, 0, toolsMenuButton.Height );
         }
 
-        private void mainPictureViewSaveAs_Click( object sender, EventArgs e )
-        {
-            saveImageOpenFolder( pictureBox.Image, "Color.png" );
-        }
-
-        private void zoomSaveAs_Click( object sender, EventArgs e )
-        {
-            saveImageOpenFolder( zoomPictureBox.Image, "Zoom.png" );
-        }
-
         private System.Drawing.Imaging.ImageCodecInfo getEncoder( System.Drawing.Imaging.ImageFormat format )
         {
             foreach( var codec in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders() ) {
@@ -903,10 +893,10 @@ namespace MyAstroPhotoLibrary
             return null;
         }
 
-        private void saveImageOpenFolder( Image image, string fileName )
+        private void saveImageOpenFolder( Image image, RgbImage rgbImage, string fileName )
         {
             using( var saveDialog = new SaveFileDialog() ) {
-                saveDialog.Filter = "PNG|*.png|BMP - 24bit|*.bmp|JPEG|*.jpg";
+                saveDialog.Filter = "PNG|*.png|PNG 16-bit|*.16-bit.png|BMP|*.bmp|JPEG|*.jpg";
                 saveDialog.FileName = fileName;
                 saveDialog.InitialDirectory = thumbnailsView.CurrentObjectPath;
                 if( saveDialog.ShowDialog() == DialogResult.OK ) {
@@ -924,7 +914,11 @@ namespace MyAstroPhotoLibrary
                             }
                             break;
                         case ".png":
-                            image.Save( saveDialog.FileName, System.Drawing.Imaging.ImageFormat.Png );
+                            if( saveDialog.FileName.ToLower().EndsWith( ".16-bit.png" ) ) {
+                                save16BitPng( saveDialog.FileName, rgbImage.GetRgbPixels16(), rgbImage.Width, rgbImage.Height );
+                            } else {
+                                image.Save( saveDialog.FileName, System.Drawing.Imaging.ImageFormat.Png );
+                            }
                             break;
                         case ".jpg": {
                                 var encoderParams = new System.Drawing.Imaging.EncoderParameters( 1 );
@@ -1060,5 +1054,54 @@ namespace MyAstroPhotoLibrary
                 }
             }
         }
+
+        private void save16BitPng( string filePath, ushort[] pixels, int width, int height )
+        {
+            var rgb16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0, 
+                System.Windows.Media.PixelFormats.Rgb48, null );
+
+            rgb16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2 * 3, 0 );
+
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( rgb16 ) );
+            using( var stream = File.OpenWrite( filePath ) ) {
+                encoder.Save( stream );
+            }
+        }
+
+        private void save16BitGrayPng( string filePath, ushort[] pixels, int width, int height )
+        {
+            var g16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0,
+                System.Windows.Media.PixelFormats.Gray16, null );
+
+            g16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2, 0 );
+
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( g16 ) );
+            using( var stream = File.OpenWrite( filePath ) ) {
+                encoder.Save( stream );
+            }
+        }
+
+        private void saveStackTo16BitPNG_Click( object sender, EventArgs e )
+        {
+            foreach( var item in EnumerateRaw( currentZoomRect ) ) {
+                using( var zoomed = item.RawImage.ExtractRgbImage( item.Rect ) ) {
+                    var filePath = prepareFilePath( item.FilePath, "PNG", ".16-bit.png" );
+                    save16BitPng( filePath, zoomed.GetRgbPixels16(), item.Rect.Width, item.Rect.Height );
+                }
+            }
+        }
+
+        private void mainPictureViewSaveAs_Click( object sender, EventArgs e )
+        {
+            saveImageOpenFolder( pictureBox.Image, stackedImage, "Color.png" );
+        }
+
+        private void zoomSaveAs_Click( object sender, EventArgs e )
+        {
+            saveImageOpenFolder( zoomPictureBox.Image, stackedZoom, "Zoom.png" );
+        }
+
     }
 }
