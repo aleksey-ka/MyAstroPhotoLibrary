@@ -167,9 +167,6 @@
     </Compile>
     <Compile Include="Tools\OpenFolderDialog.cs" />
     <Compile Include="Tools\PictureBoxOverlay.cs" />
-    <Compile Include="Tools\ProgressBar.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Tools\VisualTask.cs" />
   </ItemGroup>
   <ItemGroup>

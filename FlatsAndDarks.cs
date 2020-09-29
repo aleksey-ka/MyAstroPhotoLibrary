@@ -647,7 +647,7 @@ namespace MyAstroPhotoLibrary
             }
         }
 
-        private void createDark( ProgressBarForm progress )
+        private void createDark()
         {
             prepareTempDir();
 
