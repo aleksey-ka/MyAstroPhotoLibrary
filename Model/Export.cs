@@ -93,5 +93,33 @@ namespace MyAstroPhotoLibrary
             }
             System.IO.File.WriteAllLines( irisRoot + "hot.lst", hot.ToArray() );
         }
+
+        static public void Save16BitPng( string filePath, ushort[] pixels, int width, int height )
+        {
+            var rgb16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0,
+                System.Windows.Media.PixelFormats.Rgb48, null );
+
+            rgb16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2 * 3, 0 );
+
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( rgb16 ) );
+            using( var stream = System.IO.File.OpenWrite( filePath ) ) {
+                encoder.Save( stream );
+            }
+        }
+
+        static public void Save16BitGrayPng( string filePath, ushort[] pixels, int width, int height )
+        {
+            var g16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0,
+                System.Windows.Media.PixelFormats.Gray16, null );
+
+            g16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2, 0 );
+
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( g16 ) );
+            using( var stream = System.IO.File.OpenWrite( filePath ) ) {
+                encoder.Save( stream );
+            }
+        }
     }
 }

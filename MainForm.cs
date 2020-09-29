@@ -915,7 +915,7 @@ namespace MyAstroPhotoLibrary
                             break;
                         case ".png":
                             if( saveDialog.FileName.ToLower().EndsWith( ".16-bit.png" ) ) {
-                                save16BitPng( saveDialog.FileName, rgbImage.GetRgbPixels16(), rgbImage.Width, rgbImage.Height );
+                                Export.Save16BitPng( saveDialog.FileName, rgbImage.GetRgbPixels16(), rgbImage.Width, rgbImage.Height );
                             } else {
                                 image.Save( saveDialog.FileName, System.Drawing.Imaging.ImageFormat.Png );
                             }
@@ -1036,61 +1036,49 @@ namespace MyAstroPhotoLibrary
             return filePath;
         }
 
-        private void saveStackToPng_Click( object sender, EventArgs e )
+        private void zoomSaveStackToPng_Click( object sender, EventArgs e )
         {
-            foreach( var item in EnumerateImageSaveAs( currentZoomRect ) ) {
-                item.Image.Save( prepareFilePath( item.FilePath, "PNG", ".png" ),
-                    System.Drawing.Imaging.ImageFormat.Png );
-            }
-        }
-
-        private void saveStackToCFA_Click( object sender, EventArgs e )
-        {
-            foreach( var item in EnumerateRaw( currentZoomRect ) ) {
-                Rectangle r = item.Rect;
-                r.Inflate( 10, 10 );
-                using( var zoomed = item.RawImage.ExtractRawImage( r ) ) {
-                    zoomed.SaveCFA( prepareFilePath( item.FilePath, "CFA", ".cfa" ) );
+            VisualTask.Run( this, "Saving zoomed stack to PNG", log =>
+            {
+                foreach( var item in EnumerateImageSaveAs( currentZoomRect ) ) {
+                    var filePath = prepareFilePath( item.FilePath, "PNG", ".png" );
+                    item.Image.Save( filePath, System.Drawing.Imaging.ImageFormat.Png );
+                    log.Trace( filePath );
                 }
-            }
+                log.TraceFinished();
+            } );
         }
 
-        private void save16BitPng( string filePath, ushort[] pixels, int width, int height )
+        private void zoomSaveStackToCFA_Click( object sender, EventArgs e )
         {
-            var rgb16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0, 
-                System.Windows.Media.PixelFormats.Rgb48, null );
-
-            rgb16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2 * 3, 0 );
-
-            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( rgb16 ) );
-            using( var stream = File.OpenWrite( filePath ) ) {
-                encoder.Save( stream );
-            }
-        }
-
-        private void save16BitGrayPng( string filePath, ushort[] pixels, int width, int height )
-        {
-            var g16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0,
-                System.Windows.Media.PixelFormats.Gray16, null );
-
-            g16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2, 0 );
-
-            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( g16 ) );
-            using( var stream = File.OpenWrite( filePath ) ) {
-                encoder.Save( stream );
-            }
-        }
-
-        private void saveStackTo16BitPNG_Click( object sender, EventArgs e )
-        {
-            foreach( var item in EnumerateRaw( currentZoomRect ) ) {
-                using( var zoomed = item.RawImage.ExtractRgbImage( item.Rect ) ) {
-                    var filePath = prepareFilePath( item.FilePath, "PNG", ".16-bit.png" );
-                    save16BitPng( filePath, zoomed.GetRgbPixels16(), item.Rect.Width, item.Rect.Height );
+            VisualTask.Run( this, "Saving zoomed stack to CFA", log =>
+            {
+                foreach( var item in EnumerateRaw( currentZoomRect ) ) {
+                    var filePath = prepareFilePath( item.FilePath, "CFA", ".cfa" );
+                    Rectangle r = item.Rect;
+                    r.Inflate( 10, 10 );
+                    using( var zoomed = item.RawImage.ExtractRawImage( r ) ) {
+                        zoomed.SaveCFA( filePath );
+                    }
+                    log.Trace( filePath );
                 }
-            }
+                log.TraceFinished();
+            } );
+        }
+
+        private void zoomSaveStackTo16BitPng_Click( object sender, EventArgs e )
+        {
+            VisualTask.Run( this, "Saving zoomed stack to 16-bit PNG", log =>
+            {
+                foreach( var item in EnumerateRaw( currentZoomRect ) ) {
+                    using( var zoomed = item.RawImage.ExtractRgbImage( item.Rect ) ) {
+                        var filePath = prepareFilePath( item.FilePath, "PNG", ".16-bit.png" );
+                        Export.Save16BitPng( filePath, zoomed.GetRgbPixels16(), item.Rect.Width, item.Rect.Height );
+                        log.Trace( filePath );
+                    }
+                }
+                log.TraceFinished();
+            } );
         }
 
         private void mainPictureViewSaveAs_Click( object sender, EventArgs e )
@@ -1102,6 +1090,5 @@ namespace MyAstroPhotoLibrary
         {
             saveImageOpenFolder( zoomPictureBox.Image, stackedZoom, "Zoom.png" );
         }
-
     }
 }

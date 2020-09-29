@@ -132,7 +132,8 @@ namespace MyAstroPhotoLibrary
 
         private void calcStatistics_Click( object sender, EventArgs e )
         {
-            VisualTask.Run( this, "Calculating statistics", log => {
+            VisualTask.Run( this, "Calculating statistics", log =>
+            {
                 for( int ch = 0; ch < 4; ch++ ) {
                     double mean, sigma;
                     currentImage.RawImage.CalcStatistics( ch, currentZoomRect.X, currentZoomRect.Y, currentZoomRect.Width, currentZoomRect.Height, out mean, out sigma );

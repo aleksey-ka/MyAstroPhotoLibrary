@@ -554,14 +554,14 @@
             this.saveStackToCFAToolStripMenuItem.Name = "saveStackToCFAToolStripMenuItem";
             this.saveStackToCFAToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.saveStackToCFAToolStripMenuItem.Text = "Save Stack to CFA";
-            this.saveStackToCFAToolStripMenuItem.Click += new System.EventHandler( this.saveStackToCFA_Click );
+            this.saveStackToCFAToolStripMenuItem.Click += new System.EventHandler( this.zoomSaveStackToCFA_Click );
             // 
             // alignOnCenterOfMassToolStripMenuItem
             // 
             this.alignOnCenterOfMassToolStripMenuItem.Name = "alignOnCenterOfMassToolStripMenuItem";
             this.alignOnCenterOfMassToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.alignOnCenterOfMassToolStripMenuItem.Text = "Save Stack to PNG";
-            this.alignOnCenterOfMassToolStripMenuItem.Click += new System.EventHandler( this.saveStackToPng_Click );
+            this.alignOnCenterOfMassToolStripMenuItem.Click += new System.EventHandler( this.zoomSaveStackToPng_Click );
             // 
             // toolStripSeparator4
             // 
@@ -573,7 +573,7 @@
             this.saveStackTo16bitPNGToolStripMenuItem.Name = "saveStackTo16bitPNGToolStripMenuItem";
             this.saveStackTo16bitPNGToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.saveStackTo16bitPNGToolStripMenuItem.Text = "Save Stack to 16-bit PNG";
-            this.saveStackTo16bitPNGToolStripMenuItem.Click += new System.EventHandler( this.saveStackTo16BitPNG_Click );
+            this.saveStackTo16bitPNGToolStripMenuItem.Click += new System.EventHandler( this.zoomSaveStackTo16BitPng_Click );
             // 
             // previewToolsPanel
             // 
