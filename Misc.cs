@@ -132,8 +132,7 @@ namespace MyAstroPhotoLibrary
 
         private void calcStatistics_Click( object sender, EventArgs e )
         {
-            var log = new ProgressLog( this, "Calculating statistics" );
-            try {
+            VisualTask.Run( this, "Calculating statistics", log => {
                 for( int ch = 0; ch < 4; ch++ ) {
                     double mean, sigma;
                     currentImage.RawImage.CalcStatistics( ch, currentZoomRect.X, currentZoomRect.Y, currentZoomRect.Width, currentZoomRect.Height, out mean, out sigma );
@@ -142,29 +141,26 @@ namespace MyAstroPhotoLibrary
                     log.TraceBold( Color.LightBlue, stat );
                 }
 
-
                 /*for( int ch = 0; ch < 4; ch++ ) {
-                    var hyst = diffHystogram( currentImage.RawImage, ch );
-                    int total = 0;
-                    for( int i = 0; i < hyst.Length; i++ ) {
-                        total += hyst[i];
-                    }
-                    int sum = 0;
-                    int p98 = -1;
-                    for( int i = 0; i < hyst.Length; i++ ) {
-                        sum += hyst[i];
-                        if( 100 * sum / total > 98 ) {
-                            p98 = i;
-                            break;
+                        var hyst = diffHystogram( currentImage.RawImage, ch );
+                        int total = 0;
+                        for( int i = 0; i < hyst.Length; i++ ) {
+                            total += hyst[i];
                         }
-                    }
-                    var stat = string.Format( "{0}: MaxDiff = {1} 98% < {2}", currentImage.RawImage.Color( ch ),
-                        hyst.Length - 1, p98 );
-                    log.TraceBold( Color.LightBlue, stat );
-                }*/
-            } finally {
-                log.EndLog();
-            }
+                        int sum = 0;
+                        int p98 = -1;
+                        for( int i = 0; i < hyst.Length; i++ ) {
+                            sum += hyst[i];
+                            if( 100 * sum / total > 98 ) {
+                                p98 = i;
+                                break;
+                            }
+                        }
+                        var stat = string.Format( "{0}: MaxDiff = {1} 98% < {2}", currentImage.RawImage.Color( ch ),
+                            hyst.Length - 1, p98 );
+                        log.TraceBold( Color.LightBlue, stat );
+                    }*/
+            } );
         }
 
         private int[] diffHystogram( RawImage image, int channel )

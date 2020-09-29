@@ -12,14 +12,10 @@ namespace MyAstroPhotoLibrary
     {
         private void createFlat_Click( object sender, EventArgs e )
         {
-            var log = new ProgressLog( this, "Processing FLATs" );
-            try {
+            VisualTask.Run( this, "Processing FLATs", log => {
                 createFlat();
                 //createFlat2( log );
-            } catch( Exception ex ) {
-                log.TraceError( ex );
-            }
-            log.EndLog();
+            } );
         }
 
         private void createFlat()
@@ -76,7 +72,7 @@ namespace MyAstroPhotoLibrary
             currentSession.SetFlat( _flat );
         }
 
-        private void createFlat2( ProgressLog log )
+        private void createFlat2( ILog log )
         {
             // Ѕолее сложный вариант
 
@@ -957,8 +953,7 @@ namespace MyAstroPhotoLibrary
         
         private void buildDarksMenuItem_Click( object sender, EventArgs e )
         {
-            var log = new ProgressLog( this, "Processing DARKs" );
-            try {
+            VisualTask.Run( this, "Processing DARKs", log => {
 
                 log.TraceHeader( "Gathering statistics" );
 
@@ -1077,13 +1072,13 @@ namespace MyAstroPhotoLibrary
                             } else {
                                 hot++;
                             }
-                            
+
                         }
 
                         double mean = sum / pixels.Length;
 
                         double sumsqrdev = 0;
-                        
+
                         foreach( int pixel in pixels ) {
                             if( pixel <= hotThreshold ) {
                                 double dev = pixel - mean;
@@ -1138,10 +1133,10 @@ namespace MyAstroPhotoLibrary
                     log.Trace( "Mean = {0:0.00} Sigma = {1:0.00} Hot = {2}", mean, sigma, hot );
 
                     var bufLength = 3 * avg.Length / 2; // 12 бит на пиксель
-                    byte[] buf = new byte[bufLength]; 
+                    byte[] buf = new byte[bufLength];
                     int pos = 0;
                     for( int i = 0; i < avg.Length; i++ ) {
-                        int value = (int)Math.Round( avg[i] );
+                        int value = (int) Math.Round( avg[i] );
                         if( i % 2 == 0 ) {
                             byte hi = (byte) ( ( value & 0xFF0 ) >> 4 );
                             byte lo = (byte) ( ( value & 0xF ) << 4 );
@@ -1207,10 +1202,7 @@ namespace MyAstroPhotoLibrary
                     }
                 }
                 log.TraceFinished();
-            } catch( Exception ex ) {
-                log.TraceError( ex );
-            }
-            log.EndLog();
+            } );
         }
 
         ushort[] loadDark()
