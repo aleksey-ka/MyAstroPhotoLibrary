@@ -121,5 +121,19 @@ namespace MyAstroPhotoLibrary
                 encoder.Save( stream );
             }
         }
+
+        static public void Save16BitTiff( string filePath, ushort[] pixels, int width, int height )
+        {
+            var rgb16 = new System.Windows.Media.Imaging.WriteableBitmap( width, height, 96.0, 96.0,
+                System.Windows.Media.PixelFormats.Rgb48, null );
+
+            rgb16.WritePixels( new System.Windows.Int32Rect( 0, 0, width, height ), pixels, width * 2 * 3, 0 );
+
+            var encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+            encoder.Frames.Add( System.Windows.Media.Imaging.BitmapFrame.Create( rgb16 ) );
+            using( var stream = System.IO.File.OpenWrite( filePath ) ) {
+                encoder.Save( stream );
+            }
+        }
     }
 }

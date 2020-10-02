@@ -1036,19 +1036,6 @@ namespace MyAstroPhotoLibrary
             return filePath;
         }
 
-        private void zoomSaveStackToPng_Click( object sender, EventArgs e )
-        {
-            VisualTask.Run( this, "Saving zoomed stack to PNG", log =>
-            {
-                foreach( var item in EnumerateImageSaveAs( currentZoomRect ) ) {
-                    var filePath = prepareFilePath( item.FilePath, "PNG", ".png" );
-                    item.Image.Save( filePath, System.Drawing.Imaging.ImageFormat.Png );
-                    log.Trace( filePath );
-                }
-                log.TraceFinished();
-            } );
-        }
-
         private void zoomSaveStackToCFA_Click( object sender, EventArgs e )
         {
             VisualTask.Run( this, "Saving zoomed stack to CFA", log =>
@@ -1060,6 +1047,19 @@ namespace MyAstroPhotoLibrary
                     using( var zoomed = item.RawImage.ExtractRawImage( r ) ) {
                         zoomed.SaveCFA( filePath );
                     }
+                    log.Trace( filePath );
+                }
+                log.TraceFinished();
+            } );
+        }
+
+        private void zoomSaveStackToPng_Click( object sender, EventArgs e )
+        {
+            VisualTask.Run( this, "Saving zoomed stack to PNG", log =>
+            {
+                foreach( var item in EnumerateImageSaveAs( currentZoomRect ) ) {
+                    var filePath = prepareFilePath( item.FilePath, "PNG", ".png" );
+                    item.Image.Save( filePath, System.Drawing.Imaging.ImageFormat.Png );
                     log.Trace( filePath );
                 }
                 log.TraceFinished();
@@ -1081,14 +1081,29 @@ namespace MyAstroPhotoLibrary
             } );
         }
 
-        private void mainPictureViewSaveAs_Click( object sender, EventArgs e )
+        private void saveStackTo16BitTIFF_Click( object sender, EventArgs e )
         {
-            saveImageOpenFolder( pictureBox.Image, stackedImage, "Color.png" );
+            VisualTask.Run( this, "Saving zoomed stack to 16-bit PNG", log =>
+            {
+                foreach( var item in EnumerateRaw( currentZoomRect ) ) {
+                    using( var zoomed = item.RawImage.ExtractRgbImage( item.Rect ) ) {                      
+                        var filePath = prepareFilePath( item.FilePath, "TIFF", ".16-bit.tif" );
+                        Export.Save16BitTiff( filePath, zoomed.GetRgbPixels16(), item.Rect.Width, item.Rect.Height );
+                        log.Trace( filePath );
+                    }
+                }
+                log.TraceFinished();
+            } );
         }
 
         private void zoomSaveAs_Click( object sender, EventArgs e )
         {
             saveImageOpenFolder( zoomPictureBox.Image, stackedZoom, "Zoom.png" );
+        }
+
+        private void mainPictureViewSaveAs_Click( object sender, EventArgs e )
+        {
+            saveImageOpenFolder( pictureBox.Image, stackedImage, "Color.png" );
         }
     }
 }
