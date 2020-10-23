@@ -90,7 +90,8 @@ namespace MyAstroPhotoLibrary
             get
             {
                 if( rawImage == null ) {
-                    if( System.IO.Path.GetExtension( filePath ) == ".cfa" ) {
+                    var ext = System.IO.Path.GetExtension( filePath ).ToLower();
+                    if( ext == ".cfa" || ext == ".fit" ) {
                         rawImage = new RawImage( filePath );
                     } else {
                         rawImage = libraw.load_raw_thumbnail( filePath );

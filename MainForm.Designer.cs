@@ -72,6 +72,7 @@
             this.alignOnCenterOfMassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.saveStackTo16bitPNGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveStackTo160bitTIFF1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.previewToolsPanel = new System.Windows.Forms.Panel();
             this.waveletUpDown5 = new System.Windows.Forms.NumericUpDown();
             this.waveletUpDown4 = new System.Windows.Forms.NumericUpDown();
@@ -109,13 +110,12 @@
             this.rawPreviewRadioButton = new System.Windows.Forms.RadioButton();
             this.quickPreviewRadioButton = new System.Windows.Forms.RadioButton();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.thumbnailsView = new MyAstroPhotoLibrary.ThumbnailsView();
             this.toolsContextMenu = new System.Windows.Forms.ContextMenuStrip( this.components );
             this.buildDarksMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.thumbnailsContextMenu = new System.Windows.Forms.ContextMenuStrip( this.components );
             this.createFlatMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.darkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveStackTo160bitTIFF1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.thumbnailsView = new MyAstroPhotoLibrary.ThumbnailsView();
             ( (System.ComponentModel.ISupportInitialize) ( this.pictureBox ) ).BeginInit();
             this.mainPictureContextMenu.SuspendLayout();
             this.fillPanel.SuspendLayout();
@@ -471,111 +471,118 @@
             this.saveStackTo16bitPNGToolStripMenuItem,
             this.saveStackTo160bitTIFF1ToolStripMenuItem} );
             this.zoomContextMenu.Name = "zoomContextMenu";
-            this.zoomContextMenu.Size = new System.Drawing.Size( 244, 362 );
+            this.zoomContextMenu.Size = new System.Drawing.Size( 244, 340 );
             // 
             // stackZoomToolStripMenuItem
             // 
             this.stackZoomToolStripMenuItem.Name = "stackZoomToolStripMenuItem";
-            this.stackZoomToolStripMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.stackZoomToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.stackZoomToolStripMenuItem.Text = "Do Stack";
             this.stackZoomToolStripMenuItem.Click += new System.EventHandler( this.stackZoom_Click );
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size( 249, 6 );
+            this.toolStripSeparator1.Size = new System.Drawing.Size( 240, 6 );
             // 
             // imageInfoToolMenuItem
             // 
             this.imageInfoToolMenuItem.Name = "imageInfoToolMenuItem";
-            this.imageInfoToolMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.imageInfoToolMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.imageInfoToolMenuItem.Text = "Image Info";
             this.imageInfoToolMenuItem.Click += new System.EventHandler( this.imageInfo_Click );
             // 
             // calcStatisticsMenuItem
             // 
             this.calcStatisticsMenuItem.Name = "calcStatisticsMenuItem";
-            this.calcStatisticsMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.calcStatisticsMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.calcStatisticsMenuItem.Text = "Calc Statistics";
             this.calcStatisticsMenuItem.Click += new System.EventHandler( this.calcStatistics_Click );
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size( 249, 6 );
+            this.toolStripSeparator2.Size = new System.Drawing.Size( 240, 6 );
             // 
             // zoomSaveAsMenuItem
             // 
             this.zoomSaveAsMenuItem.Name = "zoomSaveAsMenuItem";
-            this.zoomSaveAsMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.zoomSaveAsMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.zoomSaveAsMenuItem.Text = "Save As ...";
             this.zoomSaveAsMenuItem.Click += new System.EventHandler( this.zoomSaveAs_Click );
             // 
             // waveletsMenuItem
             // 
             this.waveletsMenuItem.Name = "waveletsMenuItem";
-            this.waveletsMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.waveletsMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.waveletsMenuItem.Text = "Wavelets";
             this.waveletsMenuItem.Click += new System.EventHandler( this.wavelets_Click );
             // 
             // nextWaveletMenuItem
             // 
             this.nextWaveletMenuItem.Name = "nextWaveletMenuItem";
-            this.nextWaveletMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.nextWaveletMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.nextWaveletMenuItem.Text = "Next";
             this.nextWaveletMenuItem.Click += new System.EventHandler( this.nextWavelet_Click );
             // 
             // bgMaskMenuItem
             // 
             this.bgMaskMenuItem.Name = "bgMaskMenuItem";
-            this.bgMaskMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.bgMaskMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.bgMaskMenuItem.Text = "BG Mask";
             this.bgMaskMenuItem.Click += new System.EventHandler( this.bgMask_Click );
             // 
             // detectBGMenuItem
             // 
             this.detectBGMenuItem.Name = "detectBGMenuItem";
-            this.detectBGMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.detectBGMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.detectBGMenuItem.Text = "Detect BG";
             this.detectBGMenuItem.Click += new System.EventHandler( this.detectBG_Click );
             // 
             // doExperimentToolStripMenuItem
             // 
             this.doExperimentToolStripMenuItem.Name = "doExperimentToolStripMenuItem";
-            this.doExperimentToolStripMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.doExperimentToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.doExperimentToolStripMenuItem.Text = "Do Experiment";
             this.doExperimentToolStripMenuItem.Click += new System.EventHandler( this.doExperiment_Click );
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size( 249, 6 );
+            this.toolStripSeparator3.Size = new System.Drawing.Size( 240, 6 );
             // 
             // saveStackToCFAToolStripMenuItem
             // 
             this.saveStackToCFAToolStripMenuItem.Name = "saveStackToCFAToolStripMenuItem";
-            this.saveStackToCFAToolStripMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.saveStackToCFAToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.saveStackToCFAToolStripMenuItem.Text = "Save Stack to CFA";
             this.saveStackToCFAToolStripMenuItem.Click += new System.EventHandler( this.zoomSaveStackToCFA_Click );
             // 
             // alignOnCenterOfMassToolStripMenuItem
             // 
             this.alignOnCenterOfMassToolStripMenuItem.Name = "alignOnCenterOfMassToolStripMenuItem";
-            this.alignOnCenterOfMassToolStripMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.alignOnCenterOfMassToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.alignOnCenterOfMassToolStripMenuItem.Text = "Save Stack to PNG";
             this.alignOnCenterOfMassToolStripMenuItem.Click += new System.EventHandler( this.zoomSaveStackToPng_Click );
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size( 249, 6 );
+            this.toolStripSeparator4.Size = new System.Drawing.Size( 240, 6 );
             // 
             // saveStackTo16bitPNGToolStripMenuItem
             // 
             this.saveStackTo16bitPNGToolStripMenuItem.Name = "saveStackTo16bitPNGToolStripMenuItem";
-            this.saveStackTo16bitPNGToolStripMenuItem.Size = new System.Drawing.Size( 252, 24 );
+            this.saveStackTo16bitPNGToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
             this.saveStackTo16bitPNGToolStripMenuItem.Text = "Save Stack to 16-bit PNG";
             this.saveStackTo16bitPNGToolStripMenuItem.Click += new System.EventHandler( this.zoomSaveStackTo16BitPng_Click );
+            // 
+            // saveStackTo160bitTIFF1ToolStripMenuItem
+            // 
+            this.saveStackTo160bitTIFF1ToolStripMenuItem.Name = "saveStackTo160bitTIFF1ToolStripMenuItem";
+            this.saveStackTo160bitTIFF1ToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
+            this.saveStackTo160bitTIFF1ToolStripMenuItem.Text = "Save Stack to 16-bit TIFF";
+            this.saveStackTo160bitTIFF1ToolStripMenuItem.Click += new System.EventHandler( this.saveStackTo16BitTIFF_Click );
             // 
             // previewToolsPanel
             // 
@@ -1164,18 +1171,6 @@
             this.splitContainer.SplitterWidth = 5;
             this.splitContainer.TabIndex = 3;
             // 
-            // thumbnailsView
-            // 
-            this.thumbnailsView.AutoScroll = true;
-            this.thumbnailsView.AutoSize = true;
-            this.thumbnailsView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.thumbnailsView.Location = new System.Drawing.Point( 0, 0 );
-            this.thumbnailsView.Name = "thumbnailsView";
-            this.thumbnailsView.Size = new System.Drawing.Size( 357, 672 );
-            this.thumbnailsView.TabIndex = 0;
-            this.thumbnailsView.LoadThumbnailsCompleted += new System.EventHandler<System.EventArgs>( this.thumbnailsView_LoadThumbnailsCompleted );
-            this.thumbnailsView.SelectionChanged += new System.EventHandler<System.EventArgs>( this.thumbnailsView_SelectionChanged );
-            // 
             // toolsContextMenu
             // 
             this.toolsContextMenu.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
@@ -1212,12 +1207,17 @@
             this.darkMenuItem.Text = "DARK";
             this.darkMenuItem.Click += new System.EventHandler( this.createDark_Click );
             // 
-            // saveStackTo160bitTIFF1ToolStripMenuItem
+            // thumbnailsView
             // 
-            this.saveStackTo160bitTIFF1ToolStripMenuItem.Name = "saveStackTo160bitTIFF1ToolStripMenuItem";
-            this.saveStackTo160bitTIFF1ToolStripMenuItem.Size = new System.Drawing.Size( 243, 24 );
-            this.saveStackTo160bitTIFF1ToolStripMenuItem.Text = "Save Stack to 16-bit TIFF";
-            this.saveStackTo160bitTIFF1ToolStripMenuItem.Click += new System.EventHandler( this.saveStackTo16BitTIFF_Click );
+            this.thumbnailsView.AutoScroll = true;
+            this.thumbnailsView.AutoSize = true;
+            this.thumbnailsView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.thumbnailsView.Location = new System.Drawing.Point( 0, 0 );
+            this.thumbnailsView.Name = "thumbnailsView";
+            this.thumbnailsView.Size = new System.Drawing.Size( 357, 672 );
+            this.thumbnailsView.TabIndex = 0;
+            this.thumbnailsView.LoadThumbnailsCompleted += new System.EventHandler<System.EventArgs>( this.thumbnailsView_LoadThumbnailsCompleted );
+            this.thumbnailsView.SelectionChanged += new System.EventHandler<System.EventArgs>( this.thumbnailsView_SelectionChanged );
             // 
             // MainForm
             // 

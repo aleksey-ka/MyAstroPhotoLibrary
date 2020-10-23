@@ -185,7 +185,7 @@ namespace MyAstroPhotoLibrary
                 int nextToReport = 0;
                 foreach( var path in thumbnailsToLoad ) {
                     if( System.IO.Directory.Exists( path ) ||
-                        ".arw;.cr2;.jpg;.png;".Contains( System.IO.Path.GetExtension( path ).ToLower() ) ) {
+                        ".arw;.cr2;.jpg;.png;.fit;".Contains( System.IO.Path.GetExtension( path ).ToLower() ) ) {
                         var thumbnailData = loadThumbnailData( libraw, path );
                         lock( thumbnailsData ) {
                             thumbnailsData.Enqueue( thumbnailData );
@@ -226,6 +226,10 @@ namespace MyAstroPhotoLibrary
                         stackFiles = System.IO.Directory.GetFiles( rawDir, "*.cfa" );
                         ext = ".cfa";
                     }
+                    if( stackFiles.Length == 0 ) {
+                        stackFiles = System.IO.Directory.GetFiles( rawDir, "*.fit" );
+                        ext = ".fit";
+                    }
                 }
             } else {
                 ext = System.IO.Path.GetExtension( path ).ToLower();
@@ -246,7 +250,7 @@ namespace MyAstroPhotoLibrary
                                  + ( stackFiles == null ? "" : " (" + stackFiles.Length + ")" );
                         }
                     }
-                } else if( ext == ".cfa" ) {
+                } else if( ext == ".cfa" || ext == ".fit" ) {
                     string filePath = stackFiles == null ? path : stackFiles[0];
                     using( RawImage rawImage = new RawImage( filePath ) ) {
                         thumbnailData.image = createScaledImage( rawImage.Preview );

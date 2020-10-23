@@ -210,7 +210,7 @@ namespace MyAstroPhotoLibrary
                     zoomCenterY = currentStack[0].Offset.Y;
                 } else {
                     var files = Directory.GetFiles( rawPath ).Where(
-                        s => ".cfa;.arw;.cr2".Contains( 
+                        s => ".cfa;*.fit;.arw;.cr2".Contains( 
                         Path.GetExtension( s ).ToLower() + ";" ) ).ToArray();
                     currentStack = new StackItem[files.Length];
                     for( int i = 0; i < files.Length; i++ ) {
@@ -975,7 +975,7 @@ namespace MyAstroPhotoLibrary
         private RawImage loadRaw( string filePath )
         {
             var ext = System.IO.Path.GetExtension( filePath ).ToLower();
-            if( ext == ".cfa" ) {
+            if( ext == ".cfa" || ext == ".fit" ) {
                 return new RawImage( filePath );
             }
             return libraw.load_raw( filePath );
@@ -1024,8 +1024,8 @@ namespace MyAstroPhotoLibrary
 
         private string prepareFilePath( string srcFilePath, string folderName, string fileExtention )
         {
-            var ext = System.IO.Path.GetExtension( srcFilePath ).ToLower();
-            var filePath = srcFilePath.Replace( ext == ".cfa" ? ".cfa" : ".ARW", fileExtention ).
+            var ext = System.IO.Path.GetExtension( srcFilePath );
+            var filePath = srcFilePath.Replace( ext, fileExtention ).
                             Replace( "\\RAW\\", string.Format( "\\{0}\\", folderName ) );
             
             var dirName = filePath.Substring( 0, filePath.LastIndexOf( "\\" ) );
